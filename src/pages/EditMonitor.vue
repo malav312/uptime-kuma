@@ -4284,7 +4284,12 @@ message HealthCheckResponse {
 
                     // Special handling for MQTT, because it was wrongly used hostname field to store the URL.
                     if (this.monitor.type === "mqtt") {
-                        url = new URL(this.monitor.hostname);
+                        // The server defaults a bare hostname to mqtt://, so do the same here
+                        let hostname = this.monitor.hostname.trim();
+                        if (!/^[a-z][a-z\d+.-]*:\/\//i.test(hostname)) {
+                            hostname = "mqtt://" + hostname;
+                        }
+                        url = new URL(hostname);
                     } else {
                         url = new URL(this.monitor.url);
                     }
